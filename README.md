@@ -24,6 +24,13 @@ Basic user and post CRUD with some heavy operations (to be defined) and posting 
    - [ ] Business
      - [ ] Routes
      - [ ] Microservice client
+ - [ ] Develop frontend client _(vue ts)_
+   - [ ] Auth view
+       - [ ] Login component
+       - [ ] Register component
+   - [ ] Business view
+     - [ ] Create post component
+     - [ ] View post component
  - [ ] Develop Heavy Computation Microservice _(rust)_
    - [ ] Define behavior
    - [ ] Declare protobuffers
