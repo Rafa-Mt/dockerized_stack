@@ -3,11 +3,53 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+    restart: always
     networks:
       custom_bridge:
         ipv4_address: 192.168.100.10
-    ports:
+    depends_on:
+      - backend_server
+    ports: # ! Temporal: Replace with reverse proxy
       - "8080:8080"
+
+  backend_server:
+    build: 
+      context: ./backend_server
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      custom_bridge:
+        ipv4_address: 192.168.100.12
+    environment:
+      - ENVIRONMENT=development
+    env_file:
+      - ./env/backend_server.env
+    depends_on:
+      - postgres
+      - redis
+    ports: # ! Temporal: Replace with reverse proxy
+      - "8090:8090"
+
+  redis:
+    image: redis:8.0.2-alpine
+    restart: always
+    volumes:
+      - redis-data:/data
+    networks:
+      custom_bridge:
+        ipv4_address: 192.168.100.11
+
+  postgres:
+    image: postgres:17-alpine
+    restart: always
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    env_file:
+      - ./env/postgres.env
+      - ./backend_server/dbinit.sql:/docker-entrypoint-initdb.d/dbinit.sql
+    shm_size: 128mb
+    ports: # ! Temporal for testing
+      - "5440:5432"
 
 networks:
   custom_bridge:
@@ -15,3 +57,7 @@ networks:
     ipam:
       config:
       - subnet: 192.168.100.0/24
+
+volumes:
+  redis-data:
+  postgres-data:
