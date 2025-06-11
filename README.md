@@ -182,7 +182,7 @@ const response = await fetch(`${url}/messages`, {
 }
 ```
 
-### Restart password
+### Get all posts
     (GET) /posts
 
 #### Body
