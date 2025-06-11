@@ -1,6 +1,6 @@
 # Deployment architecture with docker
 
-### Docker services
+## Docker services
 - `client`: Frontend written in _Vue_ with _Typescript_ and built with _vite_ and _nodejs_
 - `backend_server`: Backend written in _Python_ using the _Flask_ framework
 - `heavy_computation`: _Rust_ microservice for performing fast and eficcient heavy calculations
@@ -8,11 +8,216 @@
 - `redis`: Cache database for session storage
 - `postgres`: Main database for data storage
 
-### Funcionality
+## Funcionality
 
 Basic user and post CRUD with some heavy operations (to be defined) and posting notifications via email
 
-### Todos:
+## Backend Endpoints
+
+
+### Login
+
+```
+(POST) /auth/login
+```
+
+#### Body
+
+- **_Username_**: `string` _(cannot contain spaces)_
+- **_Password_**: `string` _(minimum 8 characters, cannot contain spaces)_
+
+
+#### Example Request
+
+```ts
+const response = await fetch(`${url}/auth/login/`, {
+    method: "POST",
+    headers: {
+        "Content-Type": "Application/json"
+    },
+    body: JSON.stringify({
+        username: "el_atla",
+        password: "12345678",
+    })
+});
+```
+
+
+#### Example Response
+```json
+{
+    "success": "Logged in succesfully!",
+    "username": "elatla004"
+}
+```
+
+### Register
+
+```
+(POST) /auth/register
+```
+
+#### Body
+
+- **_Username_**: `string` _(cannot contain spaces)_
+- **_Password_**: `string` _(minimum 8 characters, cannot contain spaces)_
+- **_Email_**: `string` _(email format)_
+
+
+#### Example Request
+
+```ts
+const response = await fetch(`${url}/auth/register`, {
+    method: "POST",
+    headers: {
+        "Content-Type": "Application/json"
+    },
+    body: JSON.stringify({
+        username: "el_atla",
+        password: "12345678",
+        email: "el_atla@decoupled.dev"
+    })
+});
+```
+
+#### Example Response 
+
+```json
+{
+    "success": "User registered successfully!"
+}
+```
+
+### Send reset token
+    (POST) /auth/send-reset-token
+
+#### Body
+
+- _**Email**_: `string` _(mail format)_
+
+#### Example request
+
+```ts
+const response = await fetch(`${url}/auth/send-reset-token`, {
+    method: "POST",
+    headers: {
+        "Content-Type": "Application/json"
+    },
+    body: JSON.stringify({
+        email: "el_atla@decoupled.dev"
+    })
+});
+```
+
+#### Example Response 
+
+```json
+{
+    "success": "Reset token sent successfully"
+}
+```
+
+### Restart password
+    (PUT) /auth/restart-password
+
+#### Body
+
+- _**Email**_: `string` _(mail format)_
+- _**Token**_: `string` _(6 character hex token)_
+- _**NewPasword**_: `string` _(8 characters minimum)_
+
+#### Example request
+
+```ts
+const response = await fetch(`${url}/auth/restart-password`, {
+    method: "PUT",
+    headers: {
+        "Content-Type": "Application/json"
+    },
+    body: JSON.stringify({
+        email: "el_atla@decoupled.dev",
+        token: "123456",
+        newPassword: "supersecurepassword"
+    })
+});
+```
+
+#### Example Response 
+
+```json
+{
+    "success": "Pasword reset successfully"
+}
+```
+
+### Post message _(requires session)_
+    (POST) /posts
+
+#### Body
+
+- _**Title**_: `string` _(max 100 characters)_
+- _**Content**_: `string` _(max 500 characters)_
+
+#### Example request
+
+```ts
+const response = await fetch(`${url}/messages`, {
+    method: "POST",
+    headers: {
+        "Content-Type": "Application/json"
+    },
+    credentials: "include",
+    body: JSON.stringify({
+        title: "My new post",
+        content: "This is the content of my new post. It contains detailed information about the topic I want to share with others."
+    })
+});
+```
+
+#### Example Response 
+
+```json
+{
+    "success": "Post created successfully"
+}
+```
+
+### Restart password
+    (GET) /posts
+
+#### Body
+
+_None_
+
+#### Example request
+
+```ts
+const response = await fetch(`${url}/posts`, {
+    method: "GET",
+    credentials: "include"
+});
+```
+
+#### Example Response 
+
+```json
+{
+    "success": "Got posts!",
+    "data": [
+        {
+            "id": "4f8b3c7e-9d3a-4a6b-8f2e-3e2d9c1a7b5f",
+            "author": {
+                "username": "elatla",
+                "email": "elatla@decoupled.dev"
+            },
+            "title": "My awesome post",
+            "content": "All about my post..."
+        }
+    ]
+}
+```
+
+## Todos:
  - [x] Define Postgres data model
  - [x] Define Redis schema
  - [ ] Develop Backend Main Server _(python)_
@@ -41,6 +246,6 @@ Basic user and post CRUD with some heavy operations (to be defined) and posting 
    - [ ] Microservice server
  - [ ] Define reverse proxy behavior _(traefik)_
 
-### Docker architecture: 
+## Docker architecture: 
 
 ![](deployment_model.png)
