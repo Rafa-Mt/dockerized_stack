@@ -1,5 +1,17 @@
 # Deployment architecture with docker
 
+### Docker services
+- `client`: Frontend written in _Vue_ with _Typescript_ and built with _vite_ and _nodejs_
+- `backend_server`: Backend written in _Python_ using the _Flask_ framework
+- `heavy_computation`: _Rust_ microservice for performing fast and eficcient heavy calculations
+- `mailer`: _`language to be defined`_ microservice for mailing with _Resend_ api
+- `redis`: Cache database for session storage
+- `postgres`: Main database for data storage
+
+### Funcionality
+
+Basic user and post CRUD with some heavy operations (to be defined) and posting notifications via email
+
 ### Todos:
  - [x] Define Postgres data model
  - [x] Define Redis schema
