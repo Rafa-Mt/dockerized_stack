@@ -3,7 +3,6 @@ from redis import Redis
 from dotenv import load_dotenv
 from os import getenv
 from sqlalchemy import create_engine
-from services.routes import routes
 
 load_dotenv()  
 
@@ -28,5 +27,4 @@ if __name__ == '__main__':
         host = '0.0.0.0', 
         port = 8090, 
         debug = (enviroment == 'development'),
-        routes = routes
     )

@@ -12,6 +12,12 @@ services:
     ports: # ! Temporal: Replace with reverse proxy
       - "8080:8080"
 
+    volumes:
+      - ./client/src:/app/src
+      - ./client/public:/app/public
+      - ./client/package.json:/app/package.json
+      - ./client/package-lock.json:/app/package-lock.json
+
   backend_server:
     build: 
       context: ./backend_server
