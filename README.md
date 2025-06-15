@@ -225,10 +225,11 @@ const response = await fetch(`${url}/posts`, {
      - [ ] Sessions _(with redis state)_
      - [ ] Sign in & Sign up funcionality
      - [ ] Cookies jwt session token
-     - [ ] Routes
+     - [x] Routes
    - [ ] Business
      - [ ] Routes
      - [ ] Microservice client
+   - [ ] Replace development server for WSGI Server
  - [ ] Develop frontend client _(vue ts)_
    - [ ] Auth view
        - [ ] Login component
