@@ -2,6 +2,7 @@ flask
 flask-cors
 flask-restful
 flask-sqlalchemy
+flask-pydantic
 psycopg2-binary
 redis[hiredis]
 jwt
