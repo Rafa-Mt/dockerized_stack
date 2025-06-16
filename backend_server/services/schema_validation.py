@@ -1,6 +1,7 @@
 from typing import Optional, Annotated
 from pydantic import BaseModel, BeforeValidator, ValidationError as PydanticError
 from flask import jsonify
+from os import getenv
 import re
 
 class ValidatorError(Exception):
@@ -96,7 +97,8 @@ def validation_handler(error: ValidatorError):
     }), 400
 
 def custom_error_handler(error: Exception):
-    return jsonify({
+    jsonify({
         "error": type(error).__name__,
-        "message": str(error)
-    }), 500
+        "message": error.args[0],
+        "traceback": str(error.__traceback__) if getenv("ENVIRONMENT") == "development" else None
+        }), 500

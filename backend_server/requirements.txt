@@ -4,8 +4,8 @@ flask-restful
 flask-sqlalchemy
 flask-pydantic
 flask-bcrypt
+flask-jwt-extended
 psycopg2-binary
 redis[hiredis]
-jwt
 python-dotenv
 uuid
