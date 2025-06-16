@@ -46,8 +46,11 @@ const response = await fetch(`${url}/auth/login/`, {
 #### Example Response
 ```json
 {
-    "success": "Logged in succesfully!",
-    "username": "elatla004"
+    "message": "Logged in succesfully!",
+    "data": {
+        "username": "el_atla",
+        "email": "test@decoupled.dev"
+    }
 }
 ```
 
@@ -84,7 +87,7 @@ const response = await fetch(`${url}/auth/register`, {
 
 ```json
 {
-    "success": "User registered successfully!"
+    "message": "User registered successfully!"
 }
 ```
 
@@ -113,7 +116,7 @@ const response = await fetch(`${url}/auth/send-reset-token`, {
 
 ```json
 {
-    "success": "Reset token sent successfully"
+    "message": "Reset token sent successfully"
 }
 ```
 
@@ -146,7 +149,7 @@ const response = await fetch(`${url}/auth/restart-password`, {
 
 ```json
 {
-    "success": "Pasword reset successfully"
+    "message": "Pasword reset successfully"
 }
 ```
 
@@ -178,7 +181,7 @@ const response = await fetch(`${url}/messages`, {
 
 ```json
 {
-    "success": "Post created successfully"
+    "message": "Post created successfully"
 }
 ```
 
@@ -202,7 +205,7 @@ const response = await fetch(`${url}/posts`, {
 
 ```json
 {
-    "success": "Got posts!",
+    "message": "Got posts!",
     "data": [
         {
             "id": "4f8b3c7e-9d3a-4a6b-8f2e-3e2d9c1a7b5f",
@@ -223,7 +226,7 @@ const response = await fetch(`${url}/posts`, {
  - [ ] Develop Backend Main Server _(python)_
    - [ ] Auth 
      - [ ] Sessions _(with redis state)_
-     - [ ] Sign in & Sign up funcionality
+     - [x] Sign in & Sign up funcionality
      - [ ] Cookies jwt session token
      - [x] Routes
    - [ ] Business
