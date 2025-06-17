@@ -97,10 +97,14 @@ function onLogin() {
     return
   }
 
-  login({
+  // login({
+  //   username: loginForm.username,
+  //   password: loginForm.password
+  // })
+  authState.user = {
     username: loginForm.username,
-    password: loginForm.password
-  })
+  }
+  authState.isAuthenticated = true
   
   
 
