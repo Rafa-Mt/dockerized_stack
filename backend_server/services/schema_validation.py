@@ -85,7 +85,7 @@ class ResetPasswordSchema(BaseModel):
     token: Token
     newPassword: Password
 
-class SendPostSchema(BaseModel):
+class SubmitPostSchema(BaseModel):
     title: PostTitle
     content: PostContent
 
@@ -97,8 +97,8 @@ def validation_handler(error: ValidatorError):
     }), 400
 
 def custom_error_handler(error: Exception):
-    jsonify({
+    return jsonify({
         "error": type(error).__name__,
-        "message": error.args[0],
-        "traceback": str(error.__traceback__) if getenv("ENVIRONMENT") == "development" else None
-        }), 500
+        "message": str(error),
+        "traceback": f"At line {str(error.__traceback__.tb_lineno)}" if getenv("ENVIRONMENT") == "development" else None
+    }), 500

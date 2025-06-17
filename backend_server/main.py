@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 from os import getenv
 from routes.auth import auth
@@ -7,6 +8,8 @@ from services.schema_validation import ValidatorError, validation_handler, custo
 
 load_dotenv()  
 app = Flask(__name__)
+app.config["JWT_SECRET_KEY"] = getenv("JWT_SECRET_KEY")
+JWTManager(app)
 
 if __name__ == '__main__':
     enviroment = getenv('ENVIRONMENT', 'development')
