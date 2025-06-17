@@ -44,6 +44,8 @@ services:
     networks:
       custom_bridge:
         ipv4_address: 192.168.100.12
+    ports: # ! Temporal for testing
+      - "6379:6379"
 
   postgres:
     image: postgres:17-alpine
