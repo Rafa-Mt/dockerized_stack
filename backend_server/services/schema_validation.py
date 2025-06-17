@@ -1,5 +1,6 @@
 from typing import Optional, Annotated
 from pydantic import BaseModel, BeforeValidator, ValidationError as PydanticError
+from werkzeug.exceptions import NotFound
 from flask import jsonify
 from os import getenv
 import re
@@ -97,6 +98,11 @@ def validation_handler(error: ValidatorError):
     }), 400
 
 def custom_error_handler(error: Exception):
+    if isinstance(error, NotFound):
+        return jsonify({
+            "error": "NotFound",
+            "message": "The requested resource was not found."
+        }), 404
     return jsonify({
         "error": type(error).__name__,
         "message": str(error),
