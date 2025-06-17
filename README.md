@@ -224,10 +224,10 @@ const response = await fetch(`${url}/posts`, {
  - [x] Define Postgres data model
  - [x] Define Redis schema
  - [ ] Develop Backend Main Server _(python)_
-   - [ ] Auth 
-     - [ ] Sessions _(with redis state)_
+   - [x] Auth 
+     - [x] Sessions _(with redis state)_
      - [x] Sign in & Sign up funcionality
-     - [ ] Cookies jwt session token
+     - [x] Cookies jwt session token
      - [x] Routes
    - [ ] Business
      - [ ] Routes
