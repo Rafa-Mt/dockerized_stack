@@ -209,10 +209,41 @@ const response = await fetch(`${url}/posts`, {
     "data": [
         {
             "id": "4f8b3c7e-9d3a-4a6b-8f2e-3e2d9c1a7b5f",
-            "author": {
-                "username": "elatla",
-                "email": "elatla@decoupled.dev"
-            },
+            "author_email": "test@decoupled.dev",
+            "author_username": "test_user",
+            "title": "My awesome post",
+            "content": "All about my post..."
+        }
+    ]
+}
+```
+
+### Get posts by user
+    (GET) /posts/<user_username>
+
+#### Body
+
+_None_
+
+#### Example request
+
+```ts
+const response = await fetch(`${url}/posts/test_user`, {
+    method: "GET",
+    credentials: "include"
+});
+```
+
+#### Example Response 
+
+```json
+{
+    "message": "Got posts!",
+    "data": [
+        {
+            "id": "4f8b3c7e-9d3a-4a6b-8f2e-3e2d9c1a7b5f",
+            "author_email": "test@decoupled.dev",
+            "author_username": "test_user",
             "title": "My awesome post",
             "content": "All about my post..."
         }
