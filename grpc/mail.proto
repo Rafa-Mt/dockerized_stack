@@ -1,0 +1,22 @@
+syntax="proto3";
+
+package grpc;
+
+service MailService {
+  rpc SendWelcomeEmail(WelcomeEmailRequest) returns (EmailResponse);
+  rpc SendPasswordResetEmail(PasswordResetEmailRequest) returns (EmailResponse);
+}
+
+message WelcomeEmailRequest {
+  string email = 1;
+}
+
+message PasswordResetEmailRequest {
+  string email = 1;
+}
+
+message EmailResponse {
+  bool success = 1;
+  string message = 2;
+}
+
