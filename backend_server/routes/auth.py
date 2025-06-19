@@ -4,7 +4,7 @@ from flask_pydantic import validate
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, decode_token
 from services.redis import session_storage
-from services.schema_validation import LoginSchema, RegisterSchema, SendResetTokenSchema, ResetPasswordSchema
+from services.schema_validation import LoginSchema, RegisterSchema, SendResetTokenSchema, ResetPasswordSchema, UserToken
 from services.db import UserResponse, create_user, fetch_user_by_username
 from secrets import choice
 from string import ascii_letters, digits
@@ -69,17 +69,17 @@ def auth_middleware():
     try:
         token = request.cookies.get("access_token")
         if not token:
-            return jsonify({"message": "Missing access token"}), 401
+            return jsonify({"error": "Missing access token, please login"}), 401
         decoded_token = decode_token(token)["sub"]
 
         redis_token = session_storage.get(decoded_token)
         if not redis_token:
-            return jsonify({"message": "Invalid or expired token"}), 401
+            return jsonify({"error": "Invalid or expired token"}), 401
 
-        user_data = json.loads(redis_token)
-        request.user = user_data  # Attach user data to the request for further use
+        user_data = UserToken.from_redis(redis_token)
+        request.user = user_data  
     except Exception as e:
-        return jsonify({"message": f"Token validation failed: {str(e)}"}), 401
+        return jsonify({"error": f"Token validation failed: {str(e)}"}), 401
 
 def send_reset_token():
     ...

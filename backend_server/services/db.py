@@ -1,9 +1,10 @@
 from sqlalchemy import create_engine, Table,  MetaData, engine, select, DateTime
 from sqlalchemy.exc import IntegrityError, OperationalError
+from datetime import datetime as DateTime
 from os import getenv
 from functools import wraps
 from uuid import UUID
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 pg = create_engine(
     f"postgresql://{getenv('POSTGRES_USER')}:{getenv('POSTGRES_PASSWORD')}@{getenv('POSTGRES_HOST')}:{getenv('POSTGRES_PORT')}/{getenv('POSTGRES_DB')}"
@@ -23,6 +24,7 @@ def query(func):
     def wrapper(*args, **kwargs):
         try:
             with pg.connect() as conn:
+                
                 with conn.begin():
                     return func(conn, *args, **kwargs)
                 
@@ -74,25 +76,48 @@ def fetch_user_by_username(conn: Connection | None, username: str) -> UserRespon
     ).fetchone()
     return UserResponse.model_validate(row._asdict()) if row else None
 
-@query
-def create_post(conn: Connection | None, author_id: str | UUID, title: str, content: str):
-    return conn.execute(
-        posts.insert() \
-        .values(user_id=author_id, title=title, content=content)
-    )
-
 class PostResponse(BaseModel):
     id: UUID | str
     title: str
     content: str
     created_at: DateTime
-    user_username: str
-    user_email: str
+    author_username: str
+    author_email: str
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+class CreatedPostResponse(BaseModel):
+    id: UUID | str
+    title: str
+    content: str
+    created_at: DateTime
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 @query
-def fetch_all_posts(conn: Connection | None):
+def create_post(conn: Connection | None, author_id: str | UUID, title: str, content: str) -> CreatedPostResponse | None:
     row = conn.execute(
-        select(posts.c.id, posts.c.title, posts.c.content, posts.c.created_at, users.c.username.label('user_username'), users.c.email.label('user_email')) \
+        posts.insert() \
+        .values(user_id=author_id, title=title, content=content) \
+        .returning(posts.c.id, posts.c.title, posts.c.content, posts.c.created_at) \
+    ).fetchone()
+    return CreatedPostResponse.model_validate(row._asdict()) if row else None
+
+@query
+def fetch_all_posts(conn: Connection | None) -> list[PostResponse | None]:
+    rows = conn.execute(
+        select(posts.c.id, posts.c.title, posts.c.content, posts.c.created_at, users.c.username.label('author_username'), users.c.email.label('author_email')) \
         .join(users, posts.c.user_id == users.c.id)
     ).fetchall()
-    return [PostResponse.model_validate(row._asdict()) if row else None for row in users]
+    return [PostResponse.model_validate(row._asdict()) if row else None for row in rows]
+
+@query
+def fetch_posts_by_user(conn: Connection | None, username: str) -> list[PostResponse | None]:
+    user = fetch_user_by_username(username=username)
+
+    rows = conn.execute(
+        select(posts.c.id, posts.c.title, posts.c.content, posts.c.created_at, users.c.username.label('author_username'), users.c.email.label('author_email')) \
+        .join(users, posts.c.user_id == users.c.id) \
+        .where(users.c.id == user.id)
+    ).fetchall()
+    return [PostResponse.model_validate(row._asdict()) if row else None for row in rows]

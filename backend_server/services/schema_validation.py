@@ -1,7 +1,7 @@
 from typing import Optional, Annotated
 from pydantic import BaseModel, BeforeValidator, ValidationError as PydanticError
 from werkzeug.exceptions import NotFound
-from flask import jsonify
+from flask import jsonify, json
 from os import getenv
 import re
 
@@ -89,6 +89,16 @@ class ResetPasswordSchema(BaseModel):
 class SubmitPostSchema(BaseModel):
     title: PostTitle
     content: PostContent
+
+class UserToken(BaseModel):
+    id: str
+    username: str
+    email: str
+
+    @classmethod
+    def from_redis(cls, redis_data: str):
+        data = json.loads(redis_data)
+        return cls(**data)
 
 def validation_handler(error: ValidatorError):
     return jsonify({

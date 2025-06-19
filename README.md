@@ -230,7 +230,7 @@ const response = await fetch(`${url}/posts`, {
      - [x] Cookies jwt session token
      - [x] Routes
    - [ ] Business
-     - [ ] Routes
+     - [x] Routes
      - [ ] Microservice client
    - [ ] Replace development server for WSGI Server
  - [ ] Develop frontend client _(vue ts)_
