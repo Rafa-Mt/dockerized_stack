@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full h-full flex flex-col gap-4 items-center justify-center bg-gray-100">
+  <div class="w-full h-full flex flex-col gap-4 items-center justify-center ">
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center">
       <h2 class="text-2xl font-bold mb-6">Login</h2>
       <form @submit.prevent="onLogin" class="w-full flex flex-col gap-4">

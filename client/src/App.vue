@@ -5,7 +5,7 @@ import { authState } from './lib/auth/authState';
 </script>
 
 <template>
-  <div class="w-screen flex items-start justify-center bg-gray-100 p-4">
+  <div class="w-screen flex items-start justify-center p-4">
     
     <AuthView v-if="!authState.isAuthenticated" />
     <PostsView v-else />

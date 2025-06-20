@@ -11,7 +11,7 @@ RESEND_EMAIL = os.getenv("RESEND_EMAIL", "")
 
 app = Flask(__name__)
 
-@app.get("/send-welcome")
+@app.post("/send-welcome")
 def index():
   
   body = request.get_json()
@@ -31,7 +31,7 @@ if __name__ == "__main__":
   
   environment = os.getenv('ENVIRONMENT', 'development')
   app.run(
-        ost = '0.0.0.0', 
+        host = '0.0.0.0', 
         port = 8091, 
         debug = (environment == 'development'),
   )

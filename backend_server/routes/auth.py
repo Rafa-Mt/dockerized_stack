@@ -10,6 +10,8 @@ from secrets import choice
 from os import getenv
 from uuid import uuid4
 import requests
+from dotenv import load_dotenv
+load_dotenv()
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -75,13 +77,15 @@ def register(body: RegisterSchema):
         "data": json_dump,
         "token": redis_token
     })
-    
-    requests.post(
-        getenv("MAILER_URL" + "/send-welcome", ""),
-        json={
-            "email": body.email,
-        } 
-    )
+    try:
+        requests.post(
+            getenv("MAILER_URL", "") + "/send-welcome",
+            json={
+                "email": body.email,
+            } 
+        )
+    except Exception as e:
+        logging.error(f"Failed to send welcome email: {str(e)}")
     
     return response
 
