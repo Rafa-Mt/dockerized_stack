@@ -9,6 +9,7 @@ from services.db import UserResponse, create_user, fetch_user_by_username
 from secrets import choice
 from os import getenv
 from uuid import uuid4
+import requests
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -36,6 +37,9 @@ def login(body: LoginSchema):
         "data": retrieved_user.model_dump(exclude=["password", "id"]),
         "token": redis_token
     })
+    
+
+    
     return response
 
 @auth.post('/register')
@@ -71,6 +75,13 @@ def register(body: RegisterSchema):
         "data": json_dump,
         "token": redis_token
     })
+    
+    requests.post(
+        getenv("MAILER_URL" + "/send-welcome", ""),
+        json={
+            "email": body.email,
+        } 
+    )
     
     return response
 
