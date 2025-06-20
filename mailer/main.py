@@ -33,5 +33,5 @@ if __name__ == "__main__":
   app.run(
         ost = '0.0.0.0', 
         port = 8091, 
-        debug = (enviroment == 'development'),
+        debug = (environment == 'development'),
   )
