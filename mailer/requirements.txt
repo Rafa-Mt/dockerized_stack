@@ -1,0 +1,3 @@
+resend
+flask
+python-dotenv

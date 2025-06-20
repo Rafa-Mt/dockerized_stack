@@ -42,10 +42,19 @@ def database_error_handler(error):
 
 @query
 def create_user(conn: Connection | None, username: str, password: str, email: str):
-    return conn.execute(
+    result = conn.execute(
         users.insert() \
         .values(username=username, password=password, email=email)
+        .returning(users.c.id) \
     )
+    
+    return UserResponse.model_validate(
+        {
+            "id": result.fetchone()._asdict()["id"],
+            "username": username,
+            "password": password,
+            "email": email
+        }) 
 
 class UserResponse(BaseModel):
     id: UUID | str

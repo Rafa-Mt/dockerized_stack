@@ -8,7 +8,8 @@ posts = Blueprint('routes', __name__, url_prefix='/posts')
 
 @posts.before_request
 def auth_wrapper():
-    return auth_middleware()
+    if request.method in ['POST', 'PUT', 'DELETE', 'GET']:
+        return auth_middleware()
 
 @posts.post("/")
 @validate()
@@ -29,6 +30,7 @@ def submit_post(body: SubmitPostSchema):
 @posts.get("/")
 @validate()
 def get_all_posts():
+    print("Fetching all posts")
     posts = fetch_all_posts()
 
     return {

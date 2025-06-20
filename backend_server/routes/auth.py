@@ -1,16 +1,18 @@
 from datetime import timedelta, datetime
+import logging
 from flask import Blueprint, make_response, jsonify, json, request
 from flask_pydantic import validate
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import create_access_token, decode_token
 from services.redis import session_storage
 from services.schema_validation import LoginSchema, RegisterSchema, SendResetTokenSchema, ResetPasswordSchema, UserToken
 from services.db import UserResponse, create_user, fetch_user_by_username
 from secrets import choice
-from string import ascii_letters, digits
 from os import getenv
+from uuid import uuid4
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
+
+logging.basicConfig(level=logging.INFO)
 
 bcrypt = Bcrypt()
 
@@ -25,24 +27,15 @@ def login(body: LoginSchema):
     if not valid_login:
         raise KeyError("Invalid password")
 
-    redis_token = str.join("", [choice(ascii_letters + digits) for _ in range(64)])
-    json_dump = json.dumps({**retrieved_user.model_dump(exclude='password')})
+    redis_token = str(uuid4())
+    json_dump = json.dumps({**retrieved_user.model_dump(exclude='password'), "created_at": datetime.now().isoformat()})
     session_storage.set(name=redis_token, value=json_dump, ex=timedelta(hours=72))
-
-    enconded_jwt = create_access_token(identity=str(redis_token), expires_delta=timedelta(days=2))
 
     response = make_response({
         "message": "Found user",
-        "data": retrieved_user.model_dump(exclude=["password", "id"])
+        "data": retrieved_user.model_dump(exclude=["password", "id"]),
+        "token": redis_token
     })
-
-    response.set_cookie(
-        key="access_token",
-        value=enconded_jwt,
-        httponly=True,
-        secure=True,
-        samesite="Strict"
-    )
     return response
 
 @auth.post('/register')
@@ -50,33 +43,61 @@ def login(body: LoginSchema):
 def register(body: RegisterSchema):
     user_exists = fetch_user_by_username(username=body.username) is not None
     if user_exists:
-        raise ValueError("User already exist")
+        return jsonify({"error": "Username already exists"}), 400
     
     hashed_password = bcrypt.generate_password_hash(body.password, 8) \
         .decode('utf-8')
     
-    create_user(
+    new_user: UserResponse | None = create_user(
         username=body.username,
         email=body.email,
         password=hashed_password
     )
+    
+    if new_user is None:
+        raise ValueError("Failed to create user")
+    
+    redis_token = str(uuid4())
+    json_dump = json.dumps({
+        **new_user.model_dump(exclude='password')
+        , "created_at": datetime.now().isoformat()
+        
+    })
+    session_storage.set(name=redis_token, value=json_dump, ex=timedelta(hours=72))
 
-    return {
-        "message": "User created successfully"
-    }
+    
+    response = make_response({
+        "message": "User registered successfully",
+        "data": json_dump,
+        "token": redis_token
+    })
+    
+    return response
 
 def auth_middleware():
     try:
-        token = request.cookies.get("access_token")
+        print("Auth middleware triggered")
+        token = request.headers.get("Authorization")
+        if token and token.startswith("Bearer "):
+            token = token.split("Bearer ")[1]
         if not token:
             return jsonify({"error": "Missing access token, please login"}), 401
-        decoded_token = decode_token(token)["sub"]
-
-        redis_token = session_storage.get(decoded_token)
-        if not redis_token:
+        logging.info(f"Token received: {token}")
+        redis_data = session_storage.get(token)
+        if not redis_data:
             return jsonify({"error": "Invalid or expired token"}), 401
-
-        user_data = UserToken.from_redis(redis_token)
+        
+        user_data = UserToken.from_redis(redis_data)
+        logging.info(f"User data retrieved: {user_data}")
+        # validate user data
+        
+        if not user_data:
+            return jsonify({"error": "Invalid user data"}), 401
+        
+        # check if the token is expired
+        created_at = datetime.fromisoformat(user_data.created_at)
+        if datetime.now() - created_at > timedelta(hours=72):
+            return jsonify({"error": "Token expired, please login again"}), 401
         request.user = user_data  
     except Exception as e:
         return jsonify({"error": f"Token validation failed: {str(e)}"}), 401

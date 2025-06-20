@@ -1,56 +1,75 @@
 import { ref } from "vue";
 import type { Ref } from "vue";
 
-
 interface SuperQueryResult<T> {
   data: Ref<T | null>;
   error: Ref<string | null>;
   loading: Ref<boolean>;
+  refetch: () => Promise<void>;
 }
 
-export async function useSuperQuery<T>(url: string, options: RequestInit = {}) {
-  const resultData = ref<T | null>(null);
+export function useSuperQuery<Response>({
+  url,
+  options = {},
+}: {
+  url: string;
+  options?: RequestInit;
+}): SuperQueryResult<Response> 
+{
+  const resultData = ref<Response | null>(null);
   const resultError = ref<string | null>(null);
   const resultLoading = ref<boolean>(true);
 
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
-    });
+  async function refetch() {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...options.headers,
+        },
+      });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      resultData.value = (await response.json()) as Request;
+    } catch (error) {
+      resultError.value =
+        error instanceof Error ? error.message : String(error);
+    } finally {
+      resultLoading.value = false;
     }
-
-    resultData.value = (await response.json()) as T;
-  } catch (error) {
-    resultError.value = error instanceof Error ? error.message : String(error);
-  } finally {
-    resultLoading.value = false;
   }
+
+  // Initial fetch
+  refetch();
 
   return {
     data: resultData,
     error: resultError,
     loading: resultLoading,
-  } as SuperQueryResult<T>;
-
-
+    refetch,
+  } as SuperQueryResult<Response>;
 }
-
 
 interface SuperMutationResult<T> {
   mutate: (data: T) => Promise<void>;
   mutating?: Ref<boolean>;
 }
 
-export function useSuperMutation<Request, Response>(
-{ url, onSuccess, onError, options = {} }: { url: string; onSuccess?: (data: Response) => void; onError?: (error: Error) => void; options?: RequestInit; }): SuperMutationResult<Request> {
-  
+export function useSuperMutation<Request, Response>({
+  url,
+  onSuccess,
+  onError,
+  options = {},
+}: {
+  url: string;
+  onSuccess?: (data: Response) => void;
+  onError?: (error: Error) => void;
+  options?: RequestInit;
+}): SuperMutationResult<Request> {
   const mutating = ref<boolean>(false);
   const mutate = async (data: Request) => {
     mutating.value = true;
@@ -64,13 +83,14 @@ export function useSuperMutation<Request, Response>(
         body: JSON.stringify(data),
         ...options,
       });
-      mutating.value = false
+      mutating.value = false;
       if (!response.ok) {
-        const errorText = await response.text();
-        const error = new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+        const errorData = await response.json().catch(() => null);
+        const error = new Error(`${errorData?.error || "Unknown error"}`);
         if (onError) {
           onError(error);
         }
+        return;
       }
 
       const responseData = (await response.json()) as Response;

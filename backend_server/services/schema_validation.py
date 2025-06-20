@@ -94,6 +94,7 @@ class UserToken(BaseModel):
     id: str
     username: str
     email: str
+    created_at: str
 
     @classmethod
     def from_redis(cls, redis_data: str):

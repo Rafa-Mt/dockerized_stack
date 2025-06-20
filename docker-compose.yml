@@ -36,6 +36,19 @@ services:
     ports: # ! Temporal: Replace with reverse proxy
       - "8090:8090"
 
+  mailer:
+    build:
+      context: ./mailer
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      custom_bridge:
+        ipv4_address: 192.168.100.14
+    env_file:
+      - ./env/mailer.env
+    ports: # ! Temporal for testing
+      - "8091:8091"
+
   redis:
     image: redis:8.0.2-alpine
     restart: always

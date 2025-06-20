@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 from dotenv import load_dotenv
 from os import getenv
 from routes.auth import auth
@@ -8,6 +9,7 @@ from services.schema_validation import ValidatorError, validation_handler, custo
 
 load_dotenv()  
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 app.config["JWT_SECRET_KEY"] = getenv("JWT_SECRET_KEY")
 JWTManager(app)
 

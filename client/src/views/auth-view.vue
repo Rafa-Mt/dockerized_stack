@@ -3,9 +3,9 @@
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center">
       <h2 class="text-2xl font-bold mb-6">Login</h2>
       <form @submit.prevent="onLogin" class="w-full flex flex-col gap-4">
-        <input v-model="loginForm.username" type="text" placeholder="Username" required
+        <input v-model="loginForm.username" type="text" placeholder="Username" required minlength="3" maxlength="20"
           class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <input v-model="loginForm.password" type="password" placeholder="Password" required
+        <input v-model="loginForm.password" type="password" placeholder="Password" required minlength="8" maxlength="50"
           class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
         <button type="submit" class="w-full py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
           :disabled="loginMutating">
@@ -22,10 +22,10 @@
         <input v-model="registerForm.email" type="email" placeholder="Email" required
           class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           :disabled="registerMutating" />
-        <input v-model="registerForm.username" type="text" placeholder="Username" required
+        <input v-model="registerForm.username" type="text" placeholder="Username" required minlength="3" maxlength="20"
           class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           :disabled="registerMutating" />
-        <input v-model="registerForm.password" type="password" placeholder="Password" required
+        <input v-model="registerForm.password" type="password" placeholder="Password" required minlength="8" maxlength="50"
           class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           :disabled="registerMutating" />
         <button type="submit" class="w-full py-2 mt-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
@@ -61,11 +61,15 @@ const registerForm = reactive({
 const { mutate: login, mutating: loginMutating } = useSuperMutation<LoginTypes["Request"], LoginTypes["Response"]>({
   ...loginEndpoint,
   onSuccess: (data) => {
-    alert(`Login successful! Welcome, ${data.username}`)
+    alert(`Login successful! Welcome, ${data.data.username}!`)
     // Update auth state with user data
     authState.user = {
-      username: data.username,
+      username: data.data.username,
+      email: data.data.email, 
+      id: data.data.id,
+      token: data.token
     }
+    localStorage.setItem('token', data.token)
     authState.isAuthenticated = true
   },
   onError: (error) => {
@@ -76,12 +80,16 @@ const { mutate: login, mutating: loginMutating } = useSuperMutation<LoginTypes["
 
 const { mutate: register, mutating: registerMutating } = useSuperMutation<RegisterTypes["Request"], RegisterTypes["Response"]>({
   ...registerEndpoint,
-  onSuccess: (_data) => {
-    alert(`Registration successful! Welcome ${registerForm.username}!`)
+  onSuccess: (data) => {
     authState.user = {
-      username: registerForm.username,
+      username: data.data.username,
+      email: data.data.email,
+      id: data.data.id,
+      token: data.token
     }
+    localStorage.setItem('token', data.token)
     authState.isAuthenticated = true
+    alert(`Registration successful! Welcome ${registerForm.username}!`)
   },
   onError: (error) => {
     alert(`Registration failed: ${error.message}`)
@@ -97,15 +105,10 @@ function onLogin() {
     return
   }
 
-  // login({
-  //   username: loginForm.username,
-  //   password: loginForm.password
-  // })
-  authState.user = {
+  login({
     username: loginForm.username,
-  }
-  authState.isAuthenticated = true
-  
+    password: loginForm.password
+  })
   
 
 }
