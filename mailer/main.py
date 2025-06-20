@@ -7,7 +7,7 @@ load_dotenv()
 
 resend.api_key = os.getenv("RESEND_API_KEY")
 
-resend_email = os.getenv("RESEND_EMAIL", "")
+RESEND_EMAIL = os.getenv("RESEND_EMAIL", "")
 
 app = Flask(__name__)
 
@@ -18,7 +18,7 @@ def index():
   if not body or not body.get("email"):
     return jsonify({"error": "Email is required"}), 400
   params = {
-    "from": "onboarding@resend.dev",
+    "from": RESEND_EMAIL,
     "to": [body["email"]],
     "subject": "Bienvenido a nuestra aplicación",
     "html": "<strong>Hola</strong>",
