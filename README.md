@@ -4,7 +4,7 @@
 - `client`: Frontend written in _Vue_ with _Typescript_ and built with _vite_ and _nodejs_
 - `backend_server`: Backend written in _Python_ using the _Flask_ framework
 - `heavy_computation`: _Rust_ microservice for performing fast and eficcient heavy calculations
-- `mailer`: _`language to be defined`_ microservice for mailing with _Resend_ api
+- `mailer`: _python_ Microservice for mailing with _Resend_ api
 - `redis`: Cache database for session storage
 - `postgres`: Main database for data storage
 
