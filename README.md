@@ -254,7 +254,7 @@ const response = await fetch(`${url}/posts/test_user`, {
 ## Todos:
  - [x] Define Postgres data model
  - [x] Define Redis schema
- - [ ] Develop Backend Main Server _(python)_
+ - [x] Develop Backend Main Server _(python)_
    - [x] Auth 
      - [x] Sessions _(with redis state)_
      - [x] Sign in & Sign up funcionality
@@ -262,24 +262,24 @@ const response = await fetch(`${url}/posts/test_user`, {
      - [x] Routes
    - [ ] Business
      - [x] Routes
-     - [ ] Microservice client
+     - [x] Microservice client
    - [ ] Replace development server for WSGI Server
- - [ ] Develop frontend client _(vue ts)_
-   - [ ] Auth view
-       - [ ] Login component
-       - [ ] Register component
-   - [ ] Business view
-     - [ ] Create post component
-     - [ ] View post component
- - [ ] Develop Heavy Computation Microservice _(rust)_
-   - [ ] Define behavior
-   - [ ] Declare protobuffers
-   - [ ] Microservice server
- - [ ] Develop Mailer Server _(language to be defined, probably rust)_
-   - [ ] Resend integration
-   - [ ] Declare protobuffers
-   - [ ] Microservice server
- - [ ] Define reverse proxy behavior _(traefik)_
+ - [x] Develop frontend client _(vue ts)_
+   - [x] Auth view
+       - [x] Login component
+       - [x] Register component
+   - [x] Business view
+     - [x] Create post component
+     - [x] View post component
+ - [x] Develop Heavy Computation Microservice _(rust)_
+   - [x] Define behavior
+   - [x] Declare protobuffers
+   - [x] Microservice server
+ - [x] Develop Mailer Server _(language to be defined, probably rust)_
+   - [x] Resend integration
+   - [x] Declare protobuffers
+   - [x] Microservice server
+ - [x] Define reverse proxy behavior _(traefik)_
 
 ## Docker architecture: 
 
